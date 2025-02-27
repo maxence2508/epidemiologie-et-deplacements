@@ -1,0 +1,321 @@
+\documentclass{beamer}
+
+\usepackage[english]{babel}
+%\usepackage[french]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{graphics}
+
+\usepackage{amsthm}
+\usetheme{Warsaw}
+\setbeamercovered{transparent}
+
+
+\title{Épidémiologie et Déplacements}
+\author{Maxence Caucheteux}
+\institute{École des Ponts ParisTech}
+
+\setbeamertemplate{headline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=\paperwidth,ht=2.5ex,dp=1.125ex]{palette quaternary}% <- Ajustez les dimensions ici
+      \insertsectionnavigationhorizontal{\paperwidth}{}{\hskip0pt plus1filll}
+    \end{beamercolorbox}%
+  }
+}
+
+
+
+\begin{document}
+
+\begin{frame} 
+\titlepage 
+\end{frame}  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\begin{frame}
+%\frametitle{Ordre du jour}
+%\tableofcontents[pausesections]
+%\end{frame}
+
+
+\section{Introduction}
+\frame[t]{\frametitle{Introduction}
+\begin{block}{}
+\begin{itemize}
+\pause
+\item Proposer modèle stochastique
+\pause
+\item Construire un modèle déterministe
+\pause
+\item Définir \( \mathfrak{R}_0 \) et les liens entre les deux modèles
+\pause
+\item Analyser l'évolution épidémie en fonction des déplacements
+\end{itemize}
+\end{block}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.5\textwidth]{epidemiologie_intro.jpg}
+\caption{Illustration de l'épidémiologie}
+\label{fig:epidemiologie} 
+\end{figure}
+
+}
+
+\section{Modèle à un compartiment}
+
+\frame[t]{\frametitle{Construction du modèle : intuitivement}
+\begin{block}{Processus}
+Choix d'un individu dans la population parmi les $N$ :
+\pause
+\begin{itemize}
+\item Si cet individu est infecté, il guérit avec probabilité $p$
+\pause
+\item S'il est susceptible, il devient infecté avec probabilité $q \times \tau$
+\end{itemize}
+\end{block}
+avec $\tau = \text{proportion d'infectés}$ et $p,q \in ]0,1[$.
+}
+
+\frame[t]{\frametitle{Construction du modèle : mathématiquement}
+\pause
+\begin{block}{}
+\begin{itemize}
+\item Définition d'un système dynamique stochastique $(\mathcal{I}^N_t)_{t \in \mathbb{N}}$
+\pause
+\item $\mathcal{I}^N_t \in \{0,1 \}^N$
+\pause
+\item $\forall k \in [1,N], \ \mathcal{I}^N_{t,k}=1$ si $k$ infecté, $0$ sinon
+\end{itemize}
+\end{block}
+}
+
+\frame[t]{\frametitle{Nombre d'infectés}
+\begin{block}{Définition}
+Nombre d'infectés :
+$$I^N_t = \sum_{k=1}^N \mathcal{I}^N_{t,k}$$
+\end{block}
+\pause
+C'est une chaîne de Markov.
+}
+
+\frame[t]{\frametitle{Matrice de transition}
+\begin{block}{Propriété}
+Pour $k \in [0,N]$,
+$$\boxed{\left\{
+\begin{array}{ll}
+        Q(k,k-1)=p\frac{k}{N} \ \ \operatorname{si} k \geq 1 \\
+        Q(k,k+1)=q\frac{k}{N} (1-\frac{k}{N}) \ \ \operatorname{si} \ k<N \\
+        Q(k,k)=(1-\frac{k}{N})(1-\frac{k}{N}q)+\frac{k}{N}(1-p)
+\end{array}
+\right. }$$
+Les autres coefficients de la matrice $Q$ sont nuls. \\
+\end{block}
+}
+
+\frame[t]{\frametitle{Modèle déterministe : SIS}
+\pause
+$I$ taux d'infectés, $S$ taux d'indivdus susceptibles \pause
+$$\left\{
+\begin{array}{ll}
+        \frac{dS}{dt}=-KSI+\gamma I \\
+        \frac{dI}{dt}=KSI-\gamma I 
+\end{array}
+\right. $$
+\pause
+\begin{block}{Solution}
+Avec $\mathfrak{R}_0  = K/ \gamma$, on a :
+$$ I(t)= \left\{
+\begin{array}{ll}
+          \frac{\mathfrak{R}_0-1}{\left(\frac{1}{I_0}(\mathfrak{R}_0-1)-\mathfrak{R}_0 \right)e^{-\gamma(\mathfrak{R}_0-1)t}+\mathfrak{R}_0} \ \ \operatorname{si} \mathfrak{R}_0 \neq 1 \\
+          \frac{1}{\frac{1}{I_0}+\gamma t} \ \ \operatorname{si} \mathfrak{R}_0=1
+\end{array}
+\right. $$
+où $I(0)=I_0 \in ]0,1]$ 
+\end{block}
+}
+
+\frame[t]{\frametitle{Modèle déterministe : SIS}
+\begin{itemize}
+\item $\mathfrak{R}_0 > 1 : I(t) \longrightarrow \frac{\mathfrak{R}_0 - 1}{\mathfrak{R}_0} $ 
+\pause
+\item $\mathfrak{R}_0 \leq 1$ : la maladie s'éteint en temps long
+\end{itemize}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\textwidth]{tab_r.png}
+\caption{Divers $\mathfrak{R}_0$}
+\label{fig:matrice1} 
+\end{figure}
+}
+
+\frame[t]{\frametitle{Lien entre le modèle SIS et le processus stochastique}
+Intuition :
+\pause
+\begin{align*}
+\frac{1}{N}\mathbb{E}_k(I^N_1) \pause \simeq I(\Delta_N) & \pause = I(0)+\Delta_N I'(0)+o(\Delta_N) \pause \\
+& =\frac{k}{N}+\Delta_N \left( \left(1-\frac{k}{N} \right)K\frac{k}{N}-\gamma \frac{k}{N} \right)+o(\Delta_N)
+\end{align*}
+\pause
+Calcul :
+\pause
+$$\frac{1}{N}\mathbb{E}_k(I^N_1)=\frac{k}{N}+\frac{1}{N} \left( \left(1-\frac{k}{N} \right)\frac{k}{N}q-p\frac{k}{N} \right)$$
+\pause
+Identification : 
+\pause
+$$\boxed{\Delta_N=\frac{1}{N}, \ \gamma=p \text{ et } K=q}$$
+}
+
+\frame[t]{\frametitle{Lien entre le modèle SIS et le processus stochastique}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\textwidth]{im8-pr.png}
+\caption{Evolution des infectés avec $\mathfrak{R}_0 < 1$}
+\label{fig:matrice1} 
+\end{figure}
+}
+
+\frame[t]{\frametitle{Lien entre le modèle SIS et le processus stochastique}
+\begin{figure}[h]
+\centering
+\includegraphics[width=1\textwidth]{im10-pr.png}
+\caption{Evolution des infectés avec $\mathfrak{R}_0 > 1$}
+\label{fig:infectes1} 
+\end{figure}
+}
+
+\section{Modèle à plusieurs compartiments}
+\frame[t]{\frametitle{Construction du modèle à plusieurs compartiments}
+Soient des réels $\alpha_{i,j}>0$ tels que $\sum_{j \neq i} \alpha_{ij} = n-1$ pour tout $i$. \pause
+\begin{block}{Construction intuitive}
+Choix d'un individu au hasard dans la population. En notant $i \in [0,n-1]$ sa ville : \pause
+\begin{itemize}
+\item Action de déplacement avec probabilité $x$.
+	\begin{itemize}
+	\item Si susceptible, déménagement vers $j \neq i$ avec probabilité $\frac{\varepsilon_S}{n-1} \alpha_{ij}$ et reste dans $i$ avec probabilité $1-\varepsilon_S$
+	\item Si infecté, même chose mais on remplace $\varepsilon_S$ par $\varepsilon_I$
+	\end{itemize}
+	\pause
+\item Action sur l'état avec probabilité $1-x$.
+	\begin{itemize}
+	\item Si infecté, guérison avec probabilité $p_i$ \pause
+	\item Si susceptible, choix d'un autre individu dans la ville.
+		\begin{itemize}
+		\item Si l'autre est infecté, contamination du premier avec probabilité $q_i$
+		\item Si l'autre est susceptible, rien
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+\end{block}
+}
+
+\frame[t]{\frametitle{Construction du modèle}
+\begin{figure}[h]
+\centering
+\includegraphics[width=1.\textwidth]{im24-pr.png}
+\caption{Evolution du nombre d'infectés dans les cas $x=0$ et $x=1$}
+\label{fig:cas_particuliers_compartiments} 
+\end{figure}
+}
+
+
+\frame[t]{\frametitle{Construction du modèle déterministe associé}
+Intuition : \pause
+$\mathbb{E}(I^{N,i}_1) \pause = I_i(\Delta_N) \pause \simeq I_i(0)+\Delta_N I'_i(0)$ \\
+\pause
+Calcul :
+\pause
+$$\mathbb{E} (I^{N,i}_1) \pause =k_i+\frac{1}{Na} \left( d_I \sum_{j \in \Omega} L_{i,j} k_j + \beta_i \frac{(n_i-k_i) k_i}{n_i}-\gamma_i k_i \right)$$
+\pause
+Système d'EDO : $\forall i \in [0,n-1]$,
+\[
+\left\{
+\begin{aligned}
+\frac{dI_i}{dt} &= d_I \sum_{j \in \Omega} L_{i,j} I_j + \beta_i\frac{S_i I_i}{S_i+I_i} - \gamma_i I_i \pause \\
+\frac{dS_i}{dt} &= d_S \sum_{j \in \Omega} L_{i,j} S_j - \beta_i\frac{S_i I_i}{S_i+I_i} + \gamma_i I_i
+\end{aligned}
+\right.
+\] \pause
+où $d_I=a x\varepsilon_I$, $d_S=a x\varepsilon_S$, $\gamma_i=a (1-x) p_i$, $\beta_i=a (1-x)q_i$ et $L_{i,j}=\alpha_{ij}/(n-1)$ si $i \neq j$ et $-1$ si $i=j$.
+}
+
+
+\frame[t]{\frametitle{Convergence du modèle stochastique vers le modèle déterministe : simulations}
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{im23-pr.png}
+\caption{Convergence du modèle stochastique vers le modèle déterministe}
+\label{fig:cvg_stoch_det_compartiments} 
+\end{figure}
+}
+
+\frame[t]{\frametitle{Nombre de reproduction de base}
+\begin{block}{Définition}
+Avec $F=\text{Diag}(\beta_0,...,\beta_{n-1})$, $V=\text{Diag}(\gamma_0,...,\gamma_{n-1}) - d_I L$., on définit :
+$$\boxed{\mathfrak{R}_0=\rho(FV^{-1})}$$
+\end{block}
+}
+
+\frame[t]{\frametitle{Propriétés du $\mathfrak{R}_0$}
+\begin{block}{Propriété}
+La fonction $d_I \mapsto \mathfrak{R}_0 (d_I)$ est strictement décroissante et strictement convexe sur $]0, + \infty[$.
+\end{block}
+\pause
+
+Comme $d_I = a x \varepsilon_I$, le nombre de reproduction de base diminue avec $\varepsilon_I$.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.6\textwidth]{im22-pr.png}
+\caption{$\varepsilon_I \mapsto \mathfrak{R}_0 (d_I)$}
+\label{fig:r_eps} 
+\end{figure}
+}
+
+\frame[t]{\frametitle{Propriétés du $\mathfrak{R}_0$}
+\begin{block}{Propriété}
+Si $\mathfrak{R}_0 >1$, le modèle admet un unique équilibre endémique. Si $\mathfrak{R}_0 < 1$, il n'y a pas d'équilibre endémique.
+\end{block}
+}
+
+
+\frame[t]{\frametitle{Répartition des individus dans les villes}
+Rappel :
+\[
+\left\{
+\begin{aligned}
+\frac{dI_i}{dt} &= d_I \sum_{j \in \Omega} L_{i,j} I_j + \beta_i\frac{S_i I_i}{S_i+I_i} - \gamma_i I_i \\
+\frac{dS_i}{dt} &= d_S \sum_{j \in \Omega} L_{i,j} S_j - \beta_i\frac{S_i I_i}{S_i+I_i} + \gamma_i I_i
+\end{aligned}
+\right.
+\]
+\pause
+
+$N_i$ le nombre de personnes dans la ville $i$ \pause
+
+$$\frac{d N_i}{dt} = (d_S+d_I) \sum_{j=1}^n L_{ij} N_j$$ \pause
+Sous forme matricielle :
+$$\boxed{\frac{dN}{dt} = AN}$$
+où $A=(d_I+d_S)L$. \\
+}
+
+\frame[t]{\frametitle{Répartition des individus dans les villes}
+$N(t)=P_t N_0$ où $P_t=e^{tA}$ et $N_0$ répartition initiale des individus \pause 
+
+\begin{block}{Propriété}
+En temps long, la population s'équilibre dans les différents groupes.
+\end{block}
+}
+
+\section{Conclusion}
+\frame[t]{\frametitle{Conclusion} \pause
+\begin{itemize}
+\item On part d'un modèle stochastique \pause
+\item Passage à la limite pour trouver un modèle déterministe à partir de ce modèle stochastique \pause
+\item Introduction du $\mathfrak{R}_0$ \pause
+\item Laisser les individus se déplacer permet de diminuer le $\mathfrak{R}_0$ \pause
+\end{itemize}
+}
+
+\end{document}
